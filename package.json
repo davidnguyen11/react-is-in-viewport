@@ -1,0 +1,57 @@
+{
+  "name": "viewport",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack --config ./webpack/webpack.prod.js",
+    "start": "node ./server.js",
+    "dev": "NODE_ENV=development npm start",
+    "prod": "NODE_ENV=production npm start"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/react": "^16.9.2",
+    "@types/react-dom": "^16.9.0",
+    "@types/throttle-debounce": "^2.1.0",
+    "body-parser": "^1.19.0",
+    "clean-webpack-plugin": "^3.0.0",
+    "compression": "^1.7.4",
+    "cookie-parser": "^1.4.4",
+    "css-loader": "^3.2.0",
+    "cssnano": "^4.1.10",
+    "express": "^4.17.1",
+    "file-loader": "^4.2.0",
+    "html-webpack-plugin": "^3.2.0",
+    "less": "^3.10.3",
+    "less-loader": "^5.0.0",
+    "mini-css-extract-plugin": "^0.8.0",
+    "postcss-import": "^12.0.1",
+    "postcss-loader": "^3.0.0",
+    "postcss-preset-env": "^6.7.0",
+    "react": "^16.9.0",
+    "react-dom": "^16.9.0",
+    "style-loader": "^1.0.0",
+    "ts-loader": "^6.0.4",
+    "typescript": "^3.7.3",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.8",
+    "webpack-dev-middleware": "^3.7.1",
+    "webpack-merge": "^4.2.2"
+  },
+  "peerDependencies": {
+    "react": ">=15",
+    "react-dom": ">=15"
+  },
+  "browserslist": [
+    "last 1 version",
+    "> 1%",
+    "maintained node versions",
+    "not dead"
+  ],
+  "dependencies": {
+    "throttle-debounce": "^2.1.0"
+  }
+}
