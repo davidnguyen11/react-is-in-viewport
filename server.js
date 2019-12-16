@@ -14,6 +14,7 @@ app.use(compression());
 app.use(bodyParser.json());
 app.use(cookieParser());
 
+app.use(express.static('dist'));
 app.use('/', router);
 
 if (process.env.NODE_ENV === 'development') {
@@ -39,6 +40,6 @@ app.listen(port, err => {
   if (err) {
     throw err;
   }
-  console.log(`> ${process.env.NODE_ENV}`);
+  console.log(`> Running with ${process.env.NODE_ENV} mode`);
   console.log(`> Ready on http://localhost:${port}`);
 });

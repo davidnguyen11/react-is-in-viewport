@@ -6,7 +6,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
   entry: {
-    app: './src/index.tsx'
+    app: './src/App.tsx'
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js', '.less']
@@ -109,7 +109,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       inject: false,
       hash: false,
-      title: 'webpack boilerplate',
+      title: 'viewport demo',
       template: './public/index.html',
       filename: 'index.html'
     }),
