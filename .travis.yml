@@ -1,0 +1,13 @@
+sudo: false
+language: node_js
+cache:
+  directories:
+    - node_modules
+node_js: '8'
+install: npm install
+script:
+  - npm run lint
+branches:
+  only:
+  - master
+  - /^greenkeeper/.*$/
