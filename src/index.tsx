@@ -4,15 +4,15 @@ import { throttle } from 'throttle-debounce';
 /**
  * Viewport component allow tracking the component when it appears in the viewport
  */
-export class ViewPort extends React.Component<Props> {
+export class Screen extends React.Component<Props> {
   public static defaultProps: Partial<DataProps> = {
     type: 'fit',
     delay: 100
   };
 
-  private readonly viewportRef = React.createRef<HTMLDivElement>();
+  private readonly screenRef = React.createRef<HTMLDivElement>();
 
-  private isInViewport: () => boolean;
+  private isInScreen: () => boolean;
 
   private enterCount: number;
 
@@ -32,7 +32,7 @@ export class ViewPort extends React.Component<Props> {
       fit: this.isFittedIn,
       overlap: this.isOverlapping
     };
-    this.isInViewport = func[this.props.type];
+    this.isInScreen = func[this.props.type];
   }
 
   public componentDidMount() {
@@ -49,14 +49,14 @@ export class ViewPort extends React.Component<Props> {
 
   public render(): JSX.Element {
     return (
-      <div id={this.props.id} ref={this.viewportRef}>
+      <div id={this.props.id} ref={this.screenRef}>
         {this.props.children}
       </div>
     );
   }
 
   private handleScroll = () => {
-    if (this.isInViewport()) {
+    if (this.isInScreen()) {
       if (!this.isEntered && this.props.onEnter) {
         this.enterCount++;
         this.props.onEnter(this.enterCount);
@@ -72,14 +72,14 @@ export class ViewPort extends React.Component<Props> {
   };
 
   private isFittedIn = (): boolean => {
-    const rect = this.viewportRef.current.getBoundingClientRect();
+    const rect = this.screenRef.current.getBoundingClientRect();
     const { width, height } = this.getWidthHeight();
 
     return rect.top >= 0 && rect.left >= 0 && rect.bottom <= height && rect.right <= width;
   };
 
   private isOverlapping = (): boolean => {
-    const rect = this.viewportRef.current.getBoundingClientRect();
+    const rect = this.screenRef.current.getBoundingClientRect();
     const { width, height } = this.getWidthHeight();
 
     return (

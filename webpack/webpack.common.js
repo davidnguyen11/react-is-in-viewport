@@ -109,7 +109,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       inject: false,
       hash: false,
-      title: 'viewport demo',
+      title: 'react screen demo',
       template: './public/index.html',
       filename: 'index.html'
     }),

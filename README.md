@@ -1,21 +1,21 @@
-# React Viewport
+# React In Screen
 
 [![Build Status](https://travis-ci.com/davidnguyen179/viewport.svg?branch=master)](https://travis-ci.com/davidnguyen179/viewport) [![Greenkeeper badge](https://badges.greenkeeper.io/davidnguyen179/viewport.svg)](https://greenkeeper.io/)
 
 <hr />
 
-Viewport React component allows to track the React components in the viewport
+Screen component allows to track the React components in the viewport
 
 ## Installation
 
 ```bash
-npm i viewport --save
+npm i react-in-screen --save
 ```
 
 or
 
 ```bash
-yarn add viewport
+yarn add react-in-screen
 ```
 
 ## Usage
@@ -23,22 +23,22 @@ yarn add viewport
 ```tsx
 import * as ReactDOM from 'react-dom';
 import * as React from 'react';
-import { ViewPort } from 'viewport';
+import { Screen } from 'react-in-screen';
 
 class App extends React.Component<{}> {
   public render(): JSX.Element {
     return (
       <div>
         <div style={{ marginTop: '50%' }}>
-          <ViewPort type="overlap" onEnter={this.onEnterRed} onLeave={this.onLeaveRed}>
+          <Screen type="overlap" onEnter={this.onEnterRed} onLeave={this.onLeaveRed}>
             <div style={{ height: 100, background: 'red' }}></div>
-          </ViewPort>
+          </Screen>
         </div>
 
         <div style={{ marginTop: '200%' }}>
-          <ViewPort type="overlap" onEnter={this.onEnterBlue} onLeave={this.onLeaveBlue}>
+          <Screen type="overlap" onEnter={this.onEnterBlue} onLeave={this.onLeaveBlue}>
             <div style={{ height: 100, background: 'blue' }}></div>
-          </ViewPort>
+          </Screen>
         </div>
       </div>
     );

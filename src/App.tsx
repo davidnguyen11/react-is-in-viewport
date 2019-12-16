@@ -1,21 +1,21 @@
 import * as ReactDOM from 'react-dom';
 import * as React from 'react';
-import { ViewPort } from './';
+import { Screen } from './';
 
 class App extends React.Component<{}> {
   public render(): JSX.Element {
     return (
       <div>
         <div style={{ marginTop: '50%' }}>
-          <ViewPort type="overlap" onEnter={this.onEnterRed} onLeave={this.onLeaveRed}>
+          <Screen type="overlap" onEnter={this.onEnterRed} onLeave={this.onLeaveRed}>
             <div style={{ height: 100, background: 'red' }}></div>
-          </ViewPort>
+          </Screen>
         </div>
 
         <div style={{ marginTop: '200%' }}>
-          <ViewPort type="overlap" onEnter={this.onEnterBlue} onLeave={this.onLeaveBlue}>
+          <Screen type="overlap" onEnter={this.onEnterBlue} onLeave={this.onLeaveBlue}>
             <div style={{ height: 100, background: 'blue' }}></div>
-          </ViewPort>
+          </Screen>
         </div>
       </div>
     );
