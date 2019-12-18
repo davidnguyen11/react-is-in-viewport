@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { throttle } from 'throttle-debounce';
+import { isFittedIn, isOverlapping } from './utils';
 
 /**
  * Viewport component allow tracking the component when it appears in the viewport
@@ -12,7 +13,7 @@ export class Viewport extends React.Component<Props> {
 
   private readonly screenRef = React.createRef<HTMLDivElement>();
 
-  private isInScreen: () => boolean;
+  private isInScreen: (size: Size, rect: DOMRect) => boolean;
 
   private enterCount: number;
 
@@ -29,18 +30,16 @@ export class Viewport extends React.Component<Props> {
     this.leaveCount = 0;
     this.isLeft = false;
     const func: Func = {
-      fit: this.isFittedIn,
-      overlap: this.isOverlapping
+      fit: isFittedIn,
+      overlap: isOverlapping
     };
     this.isInScreen = func[this.props.type];
   }
 
   public componentDidMount() {
-    if (this.props.onEnter) {
-      window.addEventListener('scroll', throttle(this.props.delay, this.handleScroll), {
-        passive: true
-      });
-    }
+    window.addEventListener('scroll', throttle(this.props.delay, this.handleScroll), {
+      passive: true
+    });
   }
 
   public componentWillUnmount() {
@@ -49,14 +48,17 @@ export class Viewport extends React.Component<Props> {
 
   public render(): JSX.Element {
     return (
-      <div id={this.props.id} ref={this.screenRef}>
+      <div className={this.props.className} id={this.props.id} ref={this.screenRef}>
         {this.props.children}
       </div>
     );
   }
 
   private handleScroll = () => {
-    if (this.isInScreen()) {
+    const size = this.getWidthHeight();
+    const rect = this.screenRef.current.getBoundingClientRect();
+
+    if (this.isInScreen(size, rect)) {
       if (!this.isEntered && this.props.onEnter) {
         this.enterCount++;
         this.props.onEnter(this.enterCount);
@@ -71,25 +73,6 @@ export class Viewport extends React.Component<Props> {
     }
   };
 
-  private isFittedIn = (): boolean => {
-    const rect = this.screenRef.current.getBoundingClientRect();
-    const { width, height } = this.getWidthHeight();
-
-    return rect.top >= 0 && rect.left >= 0 && rect.bottom <= height && rect.right <= width;
-  };
-
-  private isOverlapping = (): boolean => {
-    const rect = this.screenRef.current.getBoundingClientRect();
-    const { width, height } = this.getWidthHeight();
-
-    return (
-      rect.top <= height &&
-      rect.top + rect.height >= 0 &&
-      rect.left <= width &&
-      rect.left + rect.width >= 0
-    );
-  };
-
   private getWidthHeight(): Size {
     const height = window.innerHeight || document.documentElement.clientHeight;
     const width = window.innerWidth || document.documentElement.clientWidth;
@@ -101,23 +84,25 @@ type Props = DataProps & EventProps;
 
 interface DataProps {
   /** React component node */
-  children: JSX.Element;
+  children: JSX.Element | string;
   /** Delay time for scroll event */
   delay?: number;
   /** Type of check component if it is in the viewport */
   type?: Type;
   /** Id of element */
   id?: string;
+  /** Custom CSS class */
+  className?: string;
 }
 
 interface EventProps {
   /** When component is in the viewport, event will be executed */
-  onEnter?: (enterCount?: number) => void;
+  onEnter: (enterCount?: number) => void;
   /** When component is not in the viewport, event will be executed */
   onLeave?: (leaveCount?: number) => void;
 }
 
-interface Size {
+export interface Size {
   width: number;
   height: number;
 }
@@ -125,5 +110,5 @@ interface Size {
 type Type = 'fit' | 'overlap';
 
 type Func = {
-  [key in Type]: () => boolean;
+  [key in Type]: (size: Size, rect: DOMRect) => boolean;
 };

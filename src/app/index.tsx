@@ -1,6 +1,6 @@
 import * as ReactDOM from 'react-dom';
 import * as React from 'react';
-import { Viewport } from './';
+import { Viewport } from '../';
 
 class App extends React.Component<{}> {
   public render(): JSX.Element {

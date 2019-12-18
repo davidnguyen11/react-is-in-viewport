@@ -12,7 +12,7 @@
     "target": "es5",
     "module": "commonjs",
     "declaration": true,
-    "outDir": "./lib",
+    "outDir": "./dist",
     "jsx":"react",
     "moduleResolution":"node",
     "allowSyntheticDefaultImports": true,
@@ -23,5 +23,5 @@
     "noUnusedParameters": true
   },
   "include": ["src"],
-  "exclude": ["node_modules", "**/tests/*"]
+  "exclude": ["node_modules", "**/__tests__/*"]
 }

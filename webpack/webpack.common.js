@@ -6,7 +6,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
   entry: {
-    app: './src/App.tsx'
+    app: './src/app/index.tsx'
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js', '.less']
