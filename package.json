@@ -1,5 +1,5 @@
 {
-  "name": "react-in-screen",
+  "name": "react-is-in-viewport",
   "version": "0.0.1",
   "description": "Component allows to check whether the component is in the viewport",
   "main": "lib/index.js",

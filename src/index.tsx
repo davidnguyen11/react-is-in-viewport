@@ -4,7 +4,7 @@ import { throttle } from 'throttle-debounce';
 /**
  * Viewport component allow tracking the component when it appears in the viewport
  */
-export class Screen extends React.Component<Props> {
+export class Viewport extends React.Component<Props> {
   public static defaultProps: Partial<DataProps> = {
     type: 'fit',
     delay: 100
