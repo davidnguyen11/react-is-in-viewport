@@ -31,6 +31,7 @@
     "import/order": "off",
     "import/named": "off",
     "import/default": "off",
+    "import/namespace": "off",
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/no-explicit-any": ["off"],
     "react/display-name": ["off"],
@@ -38,7 +39,8 @@
       "singleQuote": true,
       "printWidth": 100,
       "semi": true
-    }]
+    }],
+    "@typescript-eslint/no-var-requires": "off"
   },
   "overrides": [{
     "files": ["**/*.tsx"],
