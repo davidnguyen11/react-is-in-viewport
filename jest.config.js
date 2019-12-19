@@ -10,7 +10,7 @@ module.exports = {
   collectCoverage: true,
   coverageThreshold: {
     global: {
-      branches: 100,
+      branches: 80,
       functions: 100,
       lines: 100,
       statements: 100
@@ -18,7 +18,8 @@ module.exports = {
   },
   moduleFileExtensions: ['ts', 'tsx', 'js'],
   transform: {
-    '^.+\\.(ts|tsx)$': '<rootDir>/lib/test/test-preprocessor.js'
+    '^.+\\.(ts|tsx)$': 'ts-jest'
   },
-  setupFiles: ['<rootDir>/lib/test/test-shim.js', '<rootDir>/lib/test/test-setup.js']
+  setupFiles: ['<rootDir>/lib/test/test-setup.js'],
+  verbose: true
 };

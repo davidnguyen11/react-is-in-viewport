@@ -4,14 +4,21 @@ import * as sinon from 'sinon';
 import { Viewport } from '../';
 import * as Utils from '../utils';
 
-const resizeHeightWindow = height => {
+function resizeWindow(height?: number, width?: number) {
   Object.defineProperty(window, 'innerHeight', {
     writable: true,
     configurable: true,
     value: height
   });
+
+  Object.defineProperty(window, 'innerWidth', {
+    writable: true,
+    configurable: true,
+    value: width
+  });
+
   window.dispatchEvent(new Event('resize'));
-};
+}
 
 const WINDOW_INNER_HEIGHT = 2000;
 
@@ -25,7 +32,7 @@ describe('testing Viewport component', () => {
   let onLeave;
 
   beforeEach(() => {
-    resizeHeightWindow(WINDOW_INNER_HEIGHT);
+    resizeWindow(WINDOW_INNER_HEIGHT);
     eventMap = {};
 
     // sinon sandbox
@@ -51,7 +58,7 @@ describe('testing Viewport component', () => {
     jest.clearAllMocks();
   });
 
-  it('should should increase enterCount to 2 && leaveCount 1 with "fit" mode', () => {
+  it('should should increase enterCount to 2 && leaveCount 1 with "fit" mode - window', () => {
     const wrapper = mount(
       <Viewport
         onEnter={enterCount => onEnter(enterCount)}
@@ -90,6 +97,30 @@ describe('testing Viewport component', () => {
     clock.tick(delay);
     expect(onEnter.called).toBeTruthy();
     expect(onEnter.getCall(1).args[0]).toBe(2);
+  });
+
+  it('should should increase enterCount to 1 with "fit" mode - document', () => {
+    resizeWindow(undefined, undefined);
+    const wrapper = mount(
+      <Viewport
+        onEnter={enterCount => onEnter(enterCount)}
+        onLeave={leaveCount => onLeave(leaveCount)}
+      >
+        hello world
+      </Viewport>
+    );
+    const { delay, type } = wrapper.props();
+    expect(delay).toBe(100);
+    expect(type).toBe('fit');
+
+    // Enter component first time
+    isFittedIn.returns(true);
+    eventMap.scroll();
+
+    // Wait for throttling delay
+    clock.tick(delay);
+    expect(onEnter.called).toBeTruthy();
+    expect(onEnter.getCall(0).args[0]).toBe(1);
   });
 
   it('should should increase enterCount to 2 && leaveCount 1 with "overlap" mode', () => {
