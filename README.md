@@ -4,21 +4,38 @@
 
 <hr />
 
-Component allows to track the React components in the viewport
+Component allows to track the other React components whether or not it is in the Viewport.
 
 ## Installation
 
-```bash
-npm i react-is-in-viewport --save
-```
-
-or
+To install, you can use [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/lang/en/):
 
 ```bash
-yarn add react-is-in-viewport
+$ npm install react-is-in-viewport
+$ yarn add react-is-in-viewport
 ```
 
-## Usage
+
+## Props
+
+| Name| Type  | Default value  | Description
+|--|--|--|--|
+| children | React Node or string |  | React component or string that display in UI  |
+| delay | number  | 100  | Delay time to execute scrolling event callback |
+| type | 'fit'  or  'overlap'  | fit  | Mode to track component the component fits in the viewport or overlaps with viewport |
+| id | string  |  | Identifier of Viewport |
+| className | string  |  | Custom CSS class |
+
+## API
+
+| Name| Type  | Parameter  | Description
+|--|--|--|--|
+| onEnter | void  | enterCount  | When component is in the Viewport, the `enterCount` increase 1 |
+| onLeave | void  | leaveCount  | When component is not in the Viewport, the `leaveCount` increase 1 |
+
+## Example
+
+Here is a simple example of `react-is-in-viewport`
 
 ```tsx
 import * as ReactDOM from 'react-dom';
@@ -62,5 +79,4 @@ class App extends React.Component<{}> {
 }
 
 ReactDOM.render(<App />, document.getElementById('root'));
-
 ```
