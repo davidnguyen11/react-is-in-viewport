@@ -8,7 +8,8 @@ import { isFittedIn, isOverlapping } from './utils';
 export class Viewport extends React.Component<Props> {
   public static defaultProps: Partial<DataProps> = {
     type: 'fit',
-    delay: 100
+    delay: 100,
+    autoTrack: false
   };
 
   private readonly screenRef = React.createRef<HTMLDivElement>();
@@ -16,6 +17,10 @@ export class Viewport extends React.Component<Props> {
   private isInScreen: (size: Size, rect: DOMRect) => boolean;
 
   private enterCount: number;
+
+  private focusCount: number;
+
+  private counter: number;
 
   private isEntered: boolean;
 
@@ -26,6 +31,7 @@ export class Viewport extends React.Component<Props> {
   constructor(props: Props) {
     super(props);
     this.enterCount = 0;
+    this.focusCount = 0;
     this.isEntered = false;
     this.leaveCount = 0;
     this.isLeft = false;
@@ -44,6 +50,7 @@ export class Viewport extends React.Component<Props> {
 
   public componentWillUnmount() {
     window.removeEventListener('scroll', this.handleScroll);
+    this.resetCounter();
   }
 
   public render(): JSX.Element {
@@ -64,12 +71,18 @@ export class Viewport extends React.Component<Props> {
         this.props.onEnter(this.enterCount);
         this.isEntered = true;
         this.isLeft = false;
+
+        /*
+         * Only start the auto track when it is in the `fit` mode
+         */
+        this.props.type === 'fit' && this.startCounter();
       }
     } else if (this.isEntered && !this.isLeft && this.props.onLeave) {
       this.leaveCount++;
       this.props.onLeave(this.leaveCount);
       this.isLeft = true;
       this.isEntered = false;
+      this.resetCounter();
     }
   };
 
@@ -78,13 +91,40 @@ export class Viewport extends React.Component<Props> {
     const width = window.innerWidth || document.documentElement.clientWidth;
     return { width, height };
   }
+
+  private async startCounter() {
+    if (this.props.autoTrack === false) return;
+
+    if (this.props.waitToStartAutoTrack > 0) {
+      await this.sleep();
+    }
+
+    this.counter = window.setInterval(() => {
+      this.focusCount++;
+    }, 1000);
+  }
+
+  private resetCounter() {
+    if (!this.props.autoTrack) return;
+
+    if (this.props.onFocusOut) {
+      this.props.onFocusOut(this.focusCount);
+    }
+
+    clearInterval(this.counter);
+    this.focusCount = 0;
+  }
+
+  private sleep() {
+    return new Promise(resolve => setTimeout(resolve, this.props.waitToStartAutoTrack * 1000));
+  }
 }
 
 type Props = DataProps & EventProps;
 
 interface DataProps {
   /** React component node */
-  children: JSX.Element | string;
+  children: JSX.Element | JSX.Element[] | string;
   /** Delay time for scroll event */
   delay?: number;
   /** Type of check component if it is in the viewport */
@@ -93,6 +133,10 @@ interface DataProps {
   id?: string;
   /** Custom CSS class */
   className?: string;
+  /** Enable auto track, this feature only work in "fit" mode */
+  autoTrack?: boolean;
+  /** Wait to start counter for auto track, this feature only work in "fit" mode */
+  waitToStartAutoTrack?: number;
 }
 
 interface EventProps {
@@ -100,6 +144,8 @@ interface EventProps {
   onEnter: (enterCount?: number) => void;
   /** When component is not in the viewport, event will be executed */
   onLeave?: (leaveCount?: number) => void;
+  /** When component is not focused the viewport, event will be executed */
+  onFocusOut?: (focusCount?: number) => void;
 }
 
 export interface Size {
