@@ -30,6 +30,7 @@ describe('testing Viewport component', () => {
   let isOverlapping;
   let onEnter;
   let onLeave;
+  let onFocusOut;
 
   beforeEach(() => {
     resizeWindow(WINDOW_INNER_HEIGHT);
@@ -42,6 +43,7 @@ describe('testing Viewport component', () => {
     isOverlapping = sandboxes.stub(Utils, 'isOverlapping');
     onEnter = sandboxes.spy();
     onLeave = sandboxes.spy();
+    onFocusOut = sandboxes.spy();
 
     // jest mocks
     window.addEventListener = jest.fn((eventName, callback) => {
@@ -178,5 +180,96 @@ describe('testing Viewport component', () => {
     expect(eventMap).toHaveProperty('scroll');
     wrapper.unmount();
     expect(eventMap).not.toHaveProperty('scroll');
+  });
+
+  it('should increase focusCount to 2', () => {
+    const wrapper = mount(
+      <Viewport
+        autoTrack
+        onEnter={enterCount => onEnter(enterCount)}
+        onLeave={leaveCount => onLeave(leaveCount)}
+        onFocusOut={focusCount => onFocusOut(focusCount)}
+      >
+        hello world
+      </Viewport>
+    );
+    const { delay, type } = wrapper.props();
+    expect(delay).toBe(100);
+    expect(type).toBe('fit');
+
+    // Enter component first time
+    isFittedIn.returns(true);
+    eventMap.scroll();
+
+    clock.tick(delay);
+    expect(onEnter.called).toBeTruthy();
+    expect(onEnter.getCall(0).args[0]).toBe(1);
+
+    clock.tick(2000);
+
+    // Leave component first time
+    isFittedIn.returns(false);
+    eventMap.scroll();
+    expect(onLeave.called).toBeTruthy();
+    expect(onLeave.getCall(0).args[0]).toBe(1);
+
+    expect(onFocusOut.called).toBeTruthy();
+    expect(onFocusOut.getCall(0).args[0]).toBe(2);
+
+    // Enter component second time
+    isFittedIn.returns(true);
+    eventMap.scroll();
+
+    clock.tick(delay);
+    expect(onEnter.called).toBeTruthy();
+    expect(onEnter.getCall(1).args[0]).toBe(2);
+    expect(onFocusOut.getCall(1)).toBe(null);
+
+    clock.tick(1000);
+
+    // Leave component second time
+    isFittedIn.returns(false);
+    eventMap.scroll();
+    expect(onLeave.called).toBeTruthy();
+    expect(onLeave.getCall(1).args[0]).toBe(2);
+
+    expect(onFocusOut.called).toBeTruthy();
+    expect(onFocusOut.getCall(1).args[0]).toBe(1);
+  });
+
+  it('should sleep 2 seconds and then call onFocusOut', () => {
+    const wrapper = mount(
+      <Viewport
+        autoTrack
+        waitToStartAutoTrack={2}
+        onEnter={enterCount => onEnter(enterCount)}
+        onLeave={leaveCount => onLeave(leaveCount)}
+        onFocusOut={focusCount => onFocusOut(focusCount)}
+      >
+        hello world
+      </Viewport>
+    );
+    const { delay, type, waitToStartAutoTrack } = wrapper.props();
+    expect(delay).toBe(100);
+    expect(type).toBe('fit');
+    expect(waitToStartAutoTrack).toBe(2);
+
+    // Enter component first time
+    isFittedIn.returns(true);
+    eventMap.scroll();
+
+    clock.tick(delay);
+    expect(onEnter.called).toBeTruthy();
+    expect(onEnter.getCall(0).args[0]).toBe(1);
+
+    clock.tick(1000);
+
+    // Leave component first time
+    isFittedIn.returns(false);
+    eventMap.scroll();
+
+    expect(onLeave.called).toBeTruthy();
+    expect(onLeave.getCall(0).args[0]).toBe(1);
+    expect(onFocusOut.called).toBeTruthy();
   });
 });
