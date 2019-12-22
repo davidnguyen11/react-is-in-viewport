@@ -21,7 +21,7 @@ $ yarn add react-is-in-viewport
 |--|--|--|--|
 | children | React Node or string |  | React component or string that display in UI  |
 | delay | number  | 100  | Delay time to execute scrolling event callback |
-| type | 'fit'  or  'overlap'  | fit  | Mode to track component the component fits in the viewport or overlaps with viewport |
+| type | 'fit'  or  'overlap'  | fit  | Mode to track component fits in the viewport or overlaps with viewport |
 | id | string  |  | Identifier of Viewport |
 | className | string  |  | Custom CSS class |
 | autoTrack | boolean  | false | It will count how many `seconds` the user spending on the component |
