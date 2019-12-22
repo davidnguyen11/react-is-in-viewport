@@ -145,7 +145,7 @@ class App extends React.Component {
     console.log('out focus red', focusTimes);
   };
 
-onEnterBlue = (enterTimes) => {
+  onEnterBlue = (enterTimes) => {
     console.log('enter blue', enterTimes);
   };
 
