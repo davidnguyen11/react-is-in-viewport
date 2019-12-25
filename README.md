@@ -1,10 +1,18 @@
 # React Is In Viewport
 
-[![version](https://badge.fury.io/js/react-is-in-viewport.svg)](https://badge.fury.io/js/react-is-in-viewport) [![codecov](https://codecov.io/gh/davidnguyen179/react-is-in-viewport/branch/master/graph/badge.svg)](https://codecov.io/gh/davidnguyen179/react-is-in-viewport) [![Build Status](https://travis-ci.com/davidnguyen179/react-is-in-viewport.svg?branch=master)](https://travis-ci.com/davidnguyen179/react-is-in-viewport) [![Greenkeeper badge](https://badges.greenkeeper.io/davidnguyen179/react-is-in-viewport.svg)](https://greenkeeper.io/) [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/davidnguyen179/react-is-in-viewport/blob/master/LICENSE) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
+<p align="center">
+  <img width="500" alt="fit-overlap" src="https://user-images.githubusercontent.com/6290720/71453121-fa0a1d80-27cc-11ea-9e5f-06a4257fe85e.png" />
+  <br />
+  <br />
+</p>
+
+The component allows to track the other React components whether or not it is in the Viewport.
 
 <hr />
 
-The component allows to track the other React components whether or not it is in the Viewport.
+[![version](https://badge.fury.io/js/react-is-in-viewport.svg)](https://badge.fury.io/js/react-is-in-viewport) [![codecov](https://codecov.io/gh/davidnguyen179/react-is-in-viewport/branch/master/graph/badge.svg)](https://codecov.io/gh/davidnguyen179/react-is-in-viewport) [![Build Status](https://travis-ci.com/davidnguyen179/react-is-in-viewport.svg?branch=master)](https://travis-ci.com/davidnguyen179/react-is-in-viewport) [![Greenkeeper badge](https://badges.greenkeeper.io/davidnguyen179/react-is-in-viewport.svg)](https://greenkeeper.io/) [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/davidnguyen179/react-is-in-viewport/blob/master/LICENSE) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com) [![quality](https://npm.packagequality.com/shield/react-is-in-viewport.svg)](https://packagequality.com/#?package=react-is-in-viewport)
+
+[![Package Quality](https://npm.packagequality.com/badge/react-is-in-viewport.png)](https://packagequality.com/#?package=react-is-in-viewport)
 
 ## Installation
 
@@ -33,18 +41,17 @@ Here is how `type = 'fit'` and `type = 'overlap'` look like:
 
 **fit**
 
-<img width="150" alt="Screen Shot 2019-12-22 at 17 10 58" src="https://user-images.githubusercontent.com/6290720/71319400-46a9dc00-24e1-11ea-81ee-85e1bd40ca08.png">
+<img width="150" alt="fit" src="https://user-images.githubusercontent.com/6290720/71453430-86691000-27ce-11ea-94c7-828e90df09b7.png" />
 
 **overlap**
 
-<img width="150" alt="Screen Shot 2019-12-22 at 17 11 05" src="https://user-images.githubusercontent.com/6290720/71319410-66d99b00-24e1-11ea-9fe9-96fc68d11aa2.png">
-
+<img width="150" alt="overlap" src="https://user-images.githubusercontent.com/6290720/71453432-86691000-27ce-11ea-8d28-6130d381a8e1.png">
 
 ## API
 
 | Name| Type  | Parameter  | Description
 |--|--|--|--|
-| onLoad | void  |  | When component first appears in the viewport |
+| onLoad | void  |  | When components first appear and fit in the viewport |
 | onEnter | void  | enterCount  | When scrolling to a component, the `enterCount` increase 1 |
 | onLeave | void  | leaveCount  | When scrolling away from a component, the `leaveCount` increase 1 |
 | onFocusOut | void  | focusCount  | When component is not in the viewport, then `onFocusOut` called with seconds user spent on the component |
@@ -171,3 +178,7 @@ class App extends React.Component {
 
 ReactDOM.render(<App />, document.getElementById('root'));
 ```
+
+# License
+
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/davidnguyen179/react-is-in-viewport/blob/master/LICENSE) file for details
