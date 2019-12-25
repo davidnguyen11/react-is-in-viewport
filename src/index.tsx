@@ -16,29 +16,32 @@ export class Viewport extends React.Component<Props> {
 
   private isInScreen: (size: Size, rect: DOMRect) => boolean;
 
-  private enterCount: number;
+  private timer: number;
 
-  private focusCount: number;
+  private counter: Counter;
 
-  private counter: number;
-
-  private isEntered: boolean;
-
-  private leaveCount: number;
-
-  private isLeft: boolean;
+  private flag: Flag;
 
   constructor(props: Props) {
     super(props);
-    this.enterCount = 0;
-    this.focusCount = 0;
-    this.isEntered = false;
-    this.leaveCount = 0;
-    this.isLeft = false;
+
+    this.counter = {
+      enter: 0,
+      focus: 0,
+      leave: 0
+    };
+
+    this.flag = {
+      isEntered: false,
+      isLeft: false,
+      isVisited: false
+    };
+
     const func: Func = {
       fit: isFittedIn,
       overlap: isOverlapping
     };
+
     this.isInScreen = func[this.props.type];
   }
 
@@ -46,11 +49,17 @@ export class Viewport extends React.Component<Props> {
     window.addEventListener('scroll', throttle(this.props.delay, this.handleScroll), {
       passive: true
     });
+    /*
+     * Check component is in viewport
+     * Start increase enter times
+     * Start the counter if `autoTrack` turns on
+     */
+    this.handleLoad();
   }
 
   public componentWillUnmount() {
     window.removeEventListener('scroll', this.handleScroll);
-    this.resetCounter();
+    this.resetTimer();
   }
 
   public render(): JSX.Element {
@@ -66,23 +75,50 @@ export class Viewport extends React.Component<Props> {
     const rect = this.screenRef.current.getBoundingClientRect();
 
     if (this.isInScreen(size, rect)) {
-      if (!this.isEntered && this.props.onEnter) {
-        this.enterCount++;
-        this.props.onEnter(this.enterCount);
-        this.isEntered = true;
-        this.isLeft = false;
+      this.handleEnter();
+    } else {
+      this.handleLeave();
+    }
+  };
+
+  private handleLoad = () => {
+    this.handleEnter(() => {
+      this.setInternalFlag({ isVisited: true });
+      if (this.props.onLoad) {
+        this.props.onLoad();
+      }
+    });
+  };
+
+  private handleEnter = (callback?: () => void) => {
+    const size = this.getWidthHeight();
+    const rect = this.screenRef.current.getBoundingClientRect();
+
+    if (this.isInScreen(size, rect)) {
+      if (!this.flag.isEntered && !this.flag.isVisited && this.props.onEnter) {
+        this.setInternalCounter({ enter: this.counter.enter + 1 });
+        this.setInternalFlag({ isLeft: false, isEntered: true });
+        this.props.onEnter(this.counter.enter);
+        callback && callback();
 
         /*
          * Only start the auto track when it is in the `fit` mode
          */
-        this.props.type === 'fit' && this.startCounter();
+        this.props.type === 'fit' && this.startTimer();
       }
-    } else if (this.isEntered && !this.isLeft && this.props.onLeave) {
-      this.leaveCount++;
-      this.props.onLeave(this.leaveCount);
-      this.isLeft = true;
-      this.isEntered = false;
-      this.resetCounter();
+    }
+  };
+
+  private handleLeave = () => {
+    if (this.flag.isEntered && !this.flag.isLeft && this.props.onLeave) {
+      this.setInternalCounter({ leave: this.counter.leave + 1 });
+      this.setInternalFlag({
+        isLeft: true,
+        isEntered: false,
+        isVisited: false
+      });
+      this.props.onLeave(this.counter.leave);
+      this.resetTimer();
     }
   };
 
@@ -92,32 +128,46 @@ export class Viewport extends React.Component<Props> {
     return { width, height };
   }
 
-  private async startCounter() {
+  private async startTimer() {
     if (this.props.autoTrack === false) return;
 
     if (this.props.waitToStartAutoTrack > 0) {
       await this.sleep();
     }
 
-    this.counter = window.setInterval(() => {
-      this.focusCount++;
+    this.timer = window.setInterval(() => {
+      this.setInternalCounter({ focus: this.counter.focus + 1 });
     }, 1000);
   }
 
-  private resetCounter() {
+  private resetTimer() {
     if (!this.props.autoTrack) return;
 
     if (this.props.onFocusOut) {
-      this.props.onFocusOut(this.focusCount);
+      this.props.onFocusOut(this.counter.focus);
     }
 
-    clearInterval(this.counter);
-    this.focusCount = 0;
+    clearInterval(this.timer);
+    this.setInternalCounter({ focus: 0 });
   }
 
   private sleep() {
     return new Promise(resolve => setTimeout(resolve, this.props.waitToStartAutoTrack * 1000));
   }
+
+  private setInternalFlag = (flag: Flag) => {
+    this.flag = {
+      ...this.flag,
+      ...flag
+    };
+  };
+
+  private setInternalCounter = (counter: Counter) => {
+    this.counter = {
+      ...this.counter,
+      ...counter
+    };
+  };
 }
 
 type Props = DataProps & EventProps;
@@ -140,17 +190,31 @@ interface DataProps {
 }
 
 interface EventProps {
+  /** When component is mounted */
+  onLoad?: () => void;
   /** When component is in the viewport, event will be executed */
-  onEnter: (enterCount?: number) => void;
+  onEnter?: (enterTimes?: number) => void;
   /** When component is not in the viewport, event will be executed */
-  onLeave?: (leaveCount?: number) => void;
+  onLeave?: (leaveTimes?: number) => void;
   /** When component is not focused the viewport, event will be executed */
-  onFocusOut?: (focusCount?: number) => void;
+  onFocusOut?: (focusTimes?: number) => void;
 }
 
 export interface Size {
   width: number;
   height: number;
+}
+
+interface Counter {
+  enter?: number;
+  focus?: number;
+  leave?: number;
+}
+
+interface Flag {
+  isEntered?: boolean;
+  isLeft?: boolean;
+  isVisited?: boolean;
 }
 
 type Type = 'fit' | 'overlap';
