@@ -28,6 +28,7 @@ describe('testing Viewport component', () => {
   let clock;
   let isFittedIn;
   let isOverlapping;
+  let onLoad;
   let onEnter;
   let onLeave;
   let onFocusOut;
@@ -41,6 +42,7 @@ describe('testing Viewport component', () => {
     clock = sandboxes.useFakeTimers();
     isFittedIn = sandboxes.stub(Utils, 'isFittedIn');
     isOverlapping = sandboxes.stub(Utils, 'isOverlapping');
+    onLoad = sandboxes.spy();
     onEnter = sandboxes.spy();
     onLeave = sandboxes.spy();
     onFocusOut = sandboxes.spy();
@@ -63,18 +65,25 @@ describe('testing Viewport component', () => {
   it('should should increase enterCount to 2 && leaveCount 1 with "fit" mode - window', () => {
     const wrapper = mount(
       <Viewport
+        onLoad={onLoad}
         onEnter={enterCount => onEnter(enterCount)}
         onLeave={leaveCount => onLeave(leaveCount)}
       >
         hello world
       </Viewport>
     );
+    const instance = wrapper.instance();
+
     const { delay, type } = wrapper.props();
     expect(delay).toBe(100);
     expect(type).toBe('fit');
 
     // Enter component first time
     isFittedIn.returns(true);
+
+    instance.componentDidMount();
+    expect(onLoad.called).toBeTruthy();
+
     eventMap.scroll();
 
     // Wait for throttling delay

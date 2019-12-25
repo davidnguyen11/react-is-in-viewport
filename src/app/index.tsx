@@ -21,6 +21,7 @@ class App extends React.Component<{}, State> {
           <Viewport
             autoTrack
             type="fit"
+            onLoad={this.onLoadRed}
             onEnter={this.onEnterRed}
             onLeave={this.onLeaveRed}
             onFocusOut={this.onFocusOut}
@@ -33,7 +34,12 @@ class App extends React.Component<{}, State> {
         </div>
 
         <div style={{ marginTop: '200%' }}>
-          <Viewport type="overlap" onEnter={this.onEnterBlue} onLeave={this.onLeaveBlue}>
+          <Viewport
+            type="overlap"
+            onLoad={this.onLoadBlue}
+            onEnter={this.onEnterBlue}
+            onLeave={this.onLeaveBlue}
+          >
             <div style={{ height: 100, background: 'blue' }}></div>
             <div>Enter component: {this.state.enterBlue}</div>
             <div>Leave component: {this.state.leaveBlue}</div>
@@ -42,6 +48,10 @@ class App extends React.Component<{}, State> {
       </div>
     );
   }
+
+  private onLoadRed = () => {
+    console.log('component red loaded');
+  };
 
   private onEnterRed = (enterRed: number) => {
     console.log('enter red', enterRed);
@@ -58,6 +68,9 @@ class App extends React.Component<{}, State> {
     this.setState({ focusRed });
   };
 
+  private onLoadBlue = () => {
+    console.log('component blue loaded');
+  };
   private onEnterBlue = (enterBlue: number) => {
     console.log('enter blue', enterBlue);
     this.setState({ enterBlue });

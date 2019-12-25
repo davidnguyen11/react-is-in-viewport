@@ -44,9 +44,10 @@ Here is how `type = 'fit'` and `type = 'overlap'` look like:
 
 | Name| Type  | Parameter  | Description
 |--|--|--|--|
-| onEnter | void  | enterCount  | When component is in the Viewport, the `enterCount` increase 1 |
-| onLeave | void  | leaveCount  | When component is not in the Viewport, the `leaveCount` increase 1 |
-| onFocusOut | void  | focusCount  | When component is not in the Viewport, then `onFocusOut` called with seconds user spent on the component |
+| onLoad | void  |  | When component first appears in the viewport |
+| onEnter | void  | enterCount  | When scrolling to a component, the `enterCount` increase 1 |
+| onLeave | void  | leaveCount  | When scrolling away from a component, the `leaveCount` increase 1 |
+| onFocusOut | void  | focusCount  | When component is not in the viewport, then `onFocusOut` called with seconds user spent on the component |
 
 ## Example
 
@@ -64,7 +65,12 @@ class App extends React.Component {
     return (
       <div>
         <div style={{ marginTop: '50%' }}>
-          <Viewport type="fit" onEnter={this.onEnterRed} onLeave={this.onLeaveRed}>
+          <Viewport
+            type="fit"
+            onLoad={this.onLoadRed}
+            onEnter={this.onEnterRed}
+            onLeave={this.onLeaveRed}
+          >
             <div style={{ height: 100, background: 'red' }}></div>
           </Viewport>
         </div>
@@ -77,6 +83,10 @@ class App extends React.Component {
       </div>
     );
   }
+
+  onLoadRed = () => {
+    console.log('component RED loaded')
+  };
 
   onEnterRed = (enterTimes) => {
     console.log('enter red', enterTimes);
@@ -116,6 +126,7 @@ class App extends React.Component {
             autoTrack
             waitToStartAutoTrack={2}
             type="fit"
+            onLoad={this.onLoadRed}
             onEnter={this.onEnterRed}
             onLeave={this.onLeaveRed}
             onFocusOut={this.onFocusOut}
@@ -132,6 +143,10 @@ class App extends React.Component {
       </div>
     );
   }
+
+  onLoadRed = () => {
+    console.log('component RED loaded')
+  };
 
   onEnterRed = (enterTimes) => {
     console.log('enter red', enterTimes);
