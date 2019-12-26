@@ -1,6 +1,6 @@
 {
   "name": "react-is-in-viewport",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Component allows to check whether the component is in the viewport",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
