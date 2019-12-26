@@ -179,6 +179,6 @@ class App extends React.Component {
 ReactDOM.render(<App />, document.getElementById('root'));
 ```
 
-# License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](https://github.com/davidnguyen179/react-is-in-viewport/blob/master/LICENSE) file for details

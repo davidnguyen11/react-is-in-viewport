@@ -174,7 +174,7 @@ type Props = DataProps & EventProps;
 
 interface DataProps {
   /** React component node */
-  children: JSX.Element | JSX.Element[] | string;
+  children: React.ReactNode;
   /** Delay time for scroll event */
   delay?: number;
   /** Type of check component if it is in the viewport */
