@@ -20,38 +20,33 @@ class App extends React.Component<{}, State> {
         <div style={{ marginTop: '50%' }}>
           <Viewport
             autoTrack
-            type="fit"
-            onLoad={this.onLoadRed}
+            id="red"
             onEnter={this.onEnterRed}
             onLeave={this.onLeaveRed}
             onFocusOut={this.onFocusOut}
           >
             <div style={{ height: 100, background: 'red' }}></div>
-            <div>Did focus on component: {this.state.focusRed}</div>
-            <div>Enter component: {this.state.enterRed}</div>
-            <div>Leave component: {this.state.leaveRed}</div>
           </Viewport>
+          <div>Did focus on component: {this.state.focusRed}</div>
+          <div>Enter component: {this.state.enterRed}</div>
+          <div>Leave component: {this.state.leaveRed}</div>
         </div>
 
         <div style={{ marginTop: '200%' }}>
           <Viewport
-            type="overlap"
-            onLoad={this.onLoadBlue}
+            id="blue"
+            observerOptions={{ threshold: [0.5, 1] }}
             onEnter={this.onEnterBlue}
             onLeave={this.onLeaveBlue}
           >
             <div style={{ height: 100, background: 'blue' }}></div>
-            <div>Enter component: {this.state.enterBlue}</div>
-            <div>Leave component: {this.state.leaveBlue}</div>
           </Viewport>
+          <div>Enter component: {this.state.enterBlue}</div>
+          <div>Leave component: {this.state.leaveBlue}</div>
         </div>
       </div>
     );
   }
-
-  private onLoadRed = () => {
-    console.log('component red loaded');
-  };
 
   private onEnterRed = (enterRed: number) => {
     console.log('enter red', enterRed);
@@ -68,9 +63,6 @@ class App extends React.Component<{}, State> {
     this.setState({ focusRed });
   };
 
-  private onLoadBlue = () => {
-    console.log('component blue loaded');
-  };
   private onEnterBlue = (enterBlue: number) => {
     console.log('enter blue', enterBlue);
     this.setState({ enterBlue });

@@ -1,26 +1,23 @@
 import * as React from 'react';
-import { throttle } from 'throttle-debounce';
-import { isFittedIn, isOverlapping } from './utils';
 
 /**
  * Viewport component allow tracking the component when it appears in the viewport
  */
 export class Viewport extends React.Component<Props> {
   public static defaultProps: Partial<DataProps> = {
-    type: 'fit',
-    delay: 100,
-    autoTrack: false
+    autoTrack: false,
+    observerOptions: {
+      threshold: 1.0
+    }
   };
 
   private readonly screenRef = React.createRef<HTMLDivElement>();
-
-  private isInScreen: (size: Size, rect: DOMRect) => boolean;
 
   private timer: number;
 
   private counter: Counter;
 
-  private flag: Flag;
+  private observer: IntersectionObserver;
 
   constructor(props: Props) {
     super(props);
@@ -30,36 +27,20 @@ export class Viewport extends React.Component<Props> {
       focus: 0,
       leave: 0
     };
-
-    this.flag = {
-      isEntered: false,
-      isLeft: false,
-      isVisited: false
-    };
-
-    const func: Func = {
-      fit: isFittedIn,
-      overlap: isOverlapping
-    };
-
-    this.isInScreen = func[this.props.type];
   }
 
   public componentDidMount() {
-    window.addEventListener('scroll', throttle(this.props.delay, this.handleScroll), {
-      passive: true
-    });
-    /*
-     * Check component is in viewport
-     * Start increase enter times
-     * Start the counter if `autoTrack` turns on
-     */
-    this.handleLoad();
+    this.startObserver();
   }
 
   public componentWillUnmount() {
-    window.removeEventListener('scroll', this.handleScroll);
-    this.resetTimer();
+    if (this.observer && this.screenRef && this.screenRef.current) {
+      this.observer.unobserve(this.screenRef.current);
+    }
+
+    if (this.timer) {
+      clearInterval(this.timer);
+    }
   }
 
   public render(): JSX.Element {
@@ -70,63 +51,48 @@ export class Viewport extends React.Component<Props> {
     );
   }
 
-  private handleScroll = () => {
-    const size = this.getWidthHeight();
-    const rect = this.screenRef.current.getBoundingClientRect();
+  private startObserver() {
+    this.observer = new IntersectionObserver(this.handleIntersect, this.props.observerOptions);
+    this.observer.observe(this.screenRef.current);
+  }
 
-    if (this.isInScreen(size, rect)) {
-      this.handleEnter();
-    } else {
-      this.handleLeave();
-    }
-  };
+  private handleIntersect = (entries: IntersectionObserverEntry[]) => {
+    const { threshold } = this.props.observerOptions;
+    const thresholds = !Array.isArray(threshold) ? [threshold] : threshold;
 
-  private handleLoad = () => {
-    this.handleEnter(() => {
-      this.setInternalFlag({ isVisited: true });
-      if (this.props.onLoad) {
-        this.props.onLoad();
+    entries.forEach((entry: IntersectionObserverEntry) => {
+      if (entry.isIntersecting) {
+        const result = thresholds.some(item => entry.intersectionRatio >= item);
+
+        if (result) {
+          this.handleEnter(entry);
+        }
+      } else {
+        const result = thresholds.some(item => entry.intersectionRatio < item);
+        if (entry.intersectionRatio !== 0 && result) {
+          this.handleLeave();
+        }
       }
     });
   };
 
-  private handleEnter = (callback?: () => void) => {
-    const size = this.getWidthHeight();
-    const rect = this.screenRef.current.getBoundingClientRect();
+  private handleEnter = (entry?: IntersectionObserverEntry) => {
+    this.setInternalCounter({ enter: this.counter.enter + 1 });
+    this.props.onEnter(this.counter.enter);
 
-    if (this.isInScreen(size, rect)) {
-      if (!this.flag.isEntered && !this.flag.isVisited && this.props.onEnter) {
-        this.setInternalCounter({ enter: this.counter.enter + 1 });
-        this.setInternalFlag({ isLeft: false, isEntered: true });
-        this.props.onEnter(this.counter.enter);
-        callback && callback();
-
-        /*
-         * Only start the auto track when it is in the `fit` mode
-         */
-        this.props.type === 'fit' && this.startTimer();
-      }
-    }
+    /*
+     * Only start the auto track when component is fully fitted in the viewport
+     */
+    entry.intersectionRatio === 1 && this.startTimer();
   };
 
   private handleLeave = () => {
-    if (this.flag.isEntered && !this.flag.isLeft && this.props.onLeave) {
+    if (this.props.onLeave) {
       this.setInternalCounter({ leave: this.counter.leave + 1 });
-      this.setInternalFlag({
-        isLeft: true,
-        isEntered: false,
-        isVisited: false
-      });
       this.props.onLeave(this.counter.leave);
       this.resetTimer();
     }
   };
-
-  private getWidthHeight(): Size {
-    const height = window.innerHeight || document.documentElement.clientHeight;
-    const width = window.innerWidth || document.documentElement.clientWidth;
-    return { width, height };
-  }
 
   private async startTimer() {
     if (this.props.autoTrack === false) return;
@@ -155,13 +121,6 @@ export class Viewport extends React.Component<Props> {
     return new Promise(resolve => setTimeout(resolve, this.props.waitToStartAutoTrack * 1000));
   }
 
-  private setInternalFlag = (flag: Flag) => {
-    this.flag = {
-      ...this.flag,
-      ...flag
-    };
-  };
-
   private setInternalCounter = (counter: Counter) => {
     this.counter = {
       ...this.counter,
@@ -170,15 +129,11 @@ export class Viewport extends React.Component<Props> {
   };
 }
 
-type Props = DataProps & EventProps;
+export type Props = DataProps & EventProps;
 
 interface DataProps {
   /** React component node */
   children: React.ReactNode;
-  /** Delay time for scroll event */
-  delay?: number;
-  /** Type of check component if it is in the viewport */
-  type?: Type;
   /** Id of element */
   id?: string;
   /** Custom CSS class */
@@ -187,11 +142,14 @@ interface DataProps {
   autoTrack?: boolean;
   /** Wait to start counter for auto track, this feature only work in "fit" mode */
   waitToStartAutoTrack?: number;
+  /**
+   * https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API
+   * Intersection Observer options
+   */
+  observerOptions?: IntersectionObserverInit;
 }
 
 interface EventProps {
-  /** When component is mounted */
-  onLoad?: () => void;
   /** When component is in the viewport, event will be executed */
   onEnter?: (enterTimes?: number) => void;
   /** When component is not in the viewport, event will be executed */
@@ -200,25 +158,8 @@ interface EventProps {
   onFocusOut?: (focusTimes?: number) => void;
 }
 
-export interface Size {
-  width: number;
-  height: number;
-}
-
 interface Counter {
   enter?: number;
   focus?: number;
   leave?: number;
 }
-
-interface Flag {
-  isEntered?: boolean;
-  isLeft?: boolean;
-  isVisited?: boolean;
-}
-
-type Type = 'fit' | 'overlap';
-
-type Func = {
-  [key in Type]: (size: Size, rect: DOMRect) => boolean;
-};
